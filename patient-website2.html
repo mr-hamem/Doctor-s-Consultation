@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title id="pageTabTitle">Dr. Rahman | Specialist Physician</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    /* ───────────────────────────────────
+       CSS VARIABLES
+    ─────────────────────────────────── */
+    :root {
+      --primary: #1a4f6e; --primary-light: #2a7da8; --accent: #e8a020;
+      --white: #ffffff; --light-bg: #f4f8fb; --border: #d8e6ef;
+      --text-dark: #1a2c3d; --text-mid: #4a6070; --text-light: #8aabb8;
+      --success: #27ae60; --radius: 14px; --shadow: 0 4px 24px rgba(26,79,110,0.10);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'DM Sans',sans-serif; background:var(--light-bg); color:var(--text-dark); }
+    h1,h2,h3 { font-family:'Playfair Display',serif; }
+    a { text-decoration:none; color:inherit; }
+
+    /* ── NAV ── */
+    nav {
+      background:white; padding:16px 40px;
+      display:flex; align-items:center; justify-content:space-between;
+      box-shadow:0 2px 12px rgba(26,79,110,0.08);
+      position:sticky; top:0; z-index:100;
+    }
+    .nav-logo { font-family:'Playfair Display',serif; font-size:22px; color:var(--primary); font-weight:700; }
+    .nav-logo span { color:var(--accent); }
+    .nav-links { display:flex; gap:32px; list-style:none; }
+    .nav-links a { color:var(--text-mid); font-weight:500; font-size:15px; transition:color .2s; }
+    .nav-links a:hover { color:var(--primary); }
+    .btn-book-nav { background:var(--primary); color:white; padding:10px 22px; border-radius:50px; font-weight:600; font-size:14px; cursor:pointer; border:none; transition:background .2s; }
+    .btn-book-nav:hover { background:var(--primary-light); }
+
+    /* ── HERO ── */
+    .hero {
+      background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);
+      color:white; padding:70px 40px;
+      display:flex; align-items:center; gap:60px;
+      max-width:1100px; margin:40px auto; border-radius:24px;
+    }
+    .hero-photo { width:200px; height:200px; border-radius:50%; background:rgba(255,255,255,.2); display:flex; align-items:center; justify-content:center; font-size:80px; flex-shrink:0; border:5px solid rgba(255,255,255,.4); }
+    .hero-info h1 { font-size:40px; margin-bottom:8px; }
+    .hero-info .degree { font-size:15px; opacity:.85; margin-bottom:16px; line-height:1.7; }
+    .hero-badges { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
+    .badge { background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3); padding:6px 14px; border-radius:50px; font-size:13px; font-weight:500; }
+    .hero-stats { display:flex; gap:40px; margin-top:24px; }
+    .stat-num   { font-size:32px; font-weight:700; font-family:'Playfair Display',serif; }
+    .stat-label { font-size:13px; opacity:.75; }
+    .btn-book-hero { margin-top:28px; background:var(--accent); color:white; padding:14px 36px; border-radius:50px; font-weight:700; font-size:16px; cursor:pointer; border:none; transition:transform .2s,box-shadow .2s; box-shadow:0 4px 16px rgba(232,160,32,.4); }
+    .btn-book-hero:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(232,160,32,.5); }
+
+    /* ── SECTION ── */
+    .section { max-width:1100px; margin:50px auto; padding:0 20px; }
+    .section-title { font-size:30px; color:var(--primary); margin-bottom:8px; }
+    .section-subtitle { color:var(--text-mid); margin-bottom:32px; font-size:15px; }
+    .divider { width:60px; height:4px; background:var(--accent); border-radius:2px; margin-bottom:12px; }
+
+    /* ── EXPERTISE CARDS ── */
+    .expertise-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; }
+    .expertise-card { background:white;cursor: pointer; border-radius:var(--radius); padding:28px 22px; box-shadow:var(--shadow); border-top:4px solid var(--primary); transition:transform .2s; }
+    .expertise-card:hover { transform:translateY(-4px); }
+    .expertise-icon { font-size:36px; margin-bottom:14px; }
+    .expertise-card h3 { font-size:17px; color:var(--primary); margin-bottom:8px; }
+    .expertise-card p  { font-size:14px; color:var(--text-mid); line-height:1.6; }
+
+    /* ── TIMELINE ── */
+    .timeline { position:relative; padding-left:30px; }
+    .timeline::before { content:''; position:absolute; left:8px; top:0; bottom:0; width:2px; background:var(--border); }
+    .timeline-item { position:relative; margin-bottom:30px; }
+    .timeline-item::before { content:''; position:absolute; left:-26px; top:6px; width:14px; height:14px; border-radius:50%; background:var(--primary); border:3px solid white; box-shadow:0 0 0 2px var(--primary); }
+    .timeline-year  { font-size:12px; font-weight:600; color:var(--accent); text-transform:uppercase; letter-spacing:1px; }
+    .timeline-title { font-size:17px; font-weight:600; margin:4px 0; }
+    .timeline-place { font-size:14px; color:var(--text-mid); }
+
+    /* ── REVIEWS ── */
+    .reviews-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; }
+    .review-card  { background:white; border-radius:var(--radius); padding:24px; box-shadow:var(--shadow); }
+    .review-stars { color:var(--accent); font-size:18px; margin-bottom:12px; }
+    .review-text  { font-size:14px; color:var(--text-mid); line-height:1.7; font-style:italic; }
+    .review-author{ font-weight:600; margin-top:14px; font-size:14px; }
+
+    /* ── CONTACT BAR ── */
+    .contact-bar { background:var(--primary); color:white; padding:40px; border-radius:20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:30px; max-width:1100px; margin:50px auto; }
+    .contact-item { display:flex; align-items:flex-start; gap:14px; }
+    .contact-icon { font-size:24px; background:rgba(255,255,255,.15); width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .contact-label { font-size:12px; opacity:.7; margin-bottom:4px; }
+    .contact-value { font-weight:600; font-size:15px; }
+
+    footer { background:var(--text-dark); color:rgba(255,255,255,.6); text-align:center; padding:24px; font-size:13px; }
+    footer span { color:var(--accent); }
+
+    /* ── BOOKING MODAL ── */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1000; align-items:center; justify-content:center; padding:20px; }
+    .modal-overlay.active { display:flex; }
+    .modal { background:white; border-radius:20px; width:100%; max-width:560px; max-height:90vh; overflow-y:auto; padding:36px; position:relative; }
+    .modal-close { position:absolute; top:16px; right:20px; background:none; border:none; font-size:24px; cursor:pointer; color:var(--text-mid); }
+    .modal h2 { font-size:24px; color:var(--primary); margin-bottom:6px; }
+    .modal-subtitle { color:var(--text-mid); font-size:14px; margin-bottom:24px; }
+
+    /* STEPS */
+    .steps { display:flex; justify-content:space-between; margin-bottom:30px; position:relative; }
+    .steps::before { content:''; position:absolute; top:14px; left:10%; right:10%; height:2px; background:var(--border); }
+    .step { display:flex; flex-direction:column; align-items:center; gap:6px; position:relative; z-index:1; }
+    .step-circle { width:30px; height:30px; border-radius:50%; background:var(--border); color:var(--text-mid); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; transition:all .3s; }
+    .step.active .step-circle { background:var(--primary); color:white; }
+    .step.done   .step-circle { background:var(--success); color:white; }
+    .step-label  { font-size:11px; color:var(--text-mid); text-align:center; }
+
+    /* FORMS */
+    .form-group { margin-bottom:18px; }
+    .form-group label { display:block; font-size:13px; font-weight:600; color:var(--text-dark); margin-bottom:6px; }
+    .form-group input, .form-group select, .form-group textarea { width:100%; padding:12px 16px; border:2px solid var(--border); border-radius:10px; font-size:14px; font-family:'DM Sans',sans-serif; transition:border-color .2s; color:var(--text-dark); }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline:none; border-color:var(--primary-light); }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+
+    /* FEE BOX */
+    .fee-box { background:var(--light-bg); border-radius:12px; padding:18px; margin-bottom:20px; border:2px dashed var(--border); }
+    .fee-row { display:flex; justify-content:space-between; font-size:14px; margin-bottom:8px; color:var(--text-mid); }
+    .fee-row.total { font-weight:700; font-size:16px; color:var(--text-dark); border-top:1px solid var(--border); padding-top:10px; margin-top:10px; }
+
+    /* PAYMENT METHODS */
+    .payment-methods { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+    .pay-method { border:2px solid var(--border); border-radius:12px; padding:14px; cursor:pointer; transition:all .2s; text-align:center; }
+    .pay-method:hover  { border-color:var(--primary-light); }
+    .pay-method.selected { border-color:var(--primary); background:#eef5fa; }
+    .pay-method .pay-icon { font-size:28px; margin-bottom:6px; }
+    .pay-method .pay-name { font-size:13px; font-weight:600; color:var(--text-dark); }
+    .pay-method .pay-sub  { font-size:11px; color:var(--text-mid); }
+    .payment-detail { display:none; }
+    .payment-detail.active { display:block; }
+
+    /* BUTTONS */
+    .btn-primary { background:var(--primary); color:white; padding:14px 28px; border-radius:10px; font-weight:600; font-size:15px; cursor:pointer; border:none; width:100%; transition:background .2s; font-family:'DM Sans',sans-serif; }
+    .btn-primary:hover { background:var(--primary-light); }
+    .btn-secondary { background:none; color:var(--text-mid); padding:14px 28px; border-radius:10px; font-weight:600; font-size:15px; cursor:pointer; border:2px solid var(--border); width:100%; margin-top:10px; transition:all .2s; font-family:'DM Sans',sans-serif; }
+    .btn-secondary:hover { border-color:var(--primary); color:var(--primary); }
+
+    /* SUCCESS */
+    .success-screen { text-align:center; padding:20px 0; }
+    .success-icon { font-size:64px; margin-bottom:16px; }
+    .success-screen h3 { font-size:24px; color:var(--success); margin-bottom:10px; }
+    .success-screen p  { color:var(--text-mid); font-size:15px; line-height:1.7; }
+    .booking-ref { background:var(--light-bg); border-radius:10px; padding:14px; margin:20px 0; font-weight:700; color:var(--primary); font-size:18px; letter-spacing:2px; }
+    .meet-link-btn { display:inline-flex; align-items:center; gap:8px; background:#0F9D58; color:white; padding:12px 24px; border-radius:10px; font-weight:600; margin-top:14px; cursor:pointer; border:none; font-size:14px; font-family:'DM Sans',sans-serif; }
+
+    @media(max-width:768px) {
+      nav { padding:14px 20px; }
+      .nav-links { display:none; }
+      .hero { flex-direction:column; padding:40px 24px; gap:30px; margin:20px; }
+      .hero-info h1 { font-size:28px; }
+      .hero-stats { gap:24px; }
+      .section { margin:30px auto; }
+      .form-row { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Dr.<span id="navName">Rahman</span></div>
+  <ul class="nav-links">
+    <li><a href="#expertise">Expertise</a></li>
+    <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="#reviews">Reviews</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="btn-book-nav" onclick="openBooking()">📅 Book Appointment</button>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="heroSection">
+  <div class="hero-photo">👨‍⚕️</div>
+  <div class="hero-info">
+    <h1 id="heroName">Dr. Md. Abdur Rahman</h1>
+    <p class="degree" id="heroDegrees">MBBS (Dhaka Medical College) | MD – Internal Medicine | FCPS – Cardiology</p>
+    <div class="hero-badges" id="heroBadges">
+      <span class="badge">❤️ Cardiologist</span>
+      <span class="badge">🩺 Internal Medicine</span>
+      <span class="badge">🏥 Senior Consultant</span>
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-num" id="heroExp">15+</div><div class="stat-label">Years Experience</div></div>
+      <div><div class="stat-num" id="heroPatients">8,000+</div><div class="stat-label">Patients Treated</div></div>
+      <div><div class="stat-num">4.9⭐</div><div class="stat-label">Patient Rating</div></div>
+    </div>
+    <button class="btn-book-hero" id="bookBtn" onclick="openBooking()">📅 Book Appointment — ৳800</button>
+  </div>
+</div>
+
+<!-- EXPERTISE -->
+<section class="section" id="expertise">
+  <div class="divider"></div>
+  <h2 class="section-title">Areas of Expertise</h2>
+  <p class="section-subtitle">Specialised treatment with modern diagnostic techniques</p>
+  <div class="expertise-grid" id="expertiseGrid">
+    <!-- Filled by JavaScript from localStorage -->
+  </div>
+</section>
+
+<!-- PORTFOLIO / EDUCATION -->
+<section class="section" id="portfolio">
+  <div class="divider"></div>
+  <h2 class="section-title">Education & Career</h2>
+  <p class="section-subtitle">Academic and professional journey</p>
+  <div class="timeline">
+    <div class="timeline-item"><div class="timeline-year">2005 – 2011</div><div class="timeline-title">MBBS — Dhaka Medical College</div><div class="timeline-place">University of Dhaka, Bangladesh</div></div>
+    <div class="timeline-item"><div class="timeline-year">2012 – 2015</div><div class="timeline-title">MD (Internal Medicine) — BSMMU</div><div class="timeline-place">Bangabandhu Sheikh Mujib Medical University, Dhaka</div></div>
+    <div class="timeline-item"><div class="timeline-year">2016 – 2018</div><div class="timeline-title">FCPS – Cardiology</div><div class="timeline-place">Bangladesh College of Physicians & Surgeons (BCPS)</div></div>
+    <div class="timeline-item"><div class="timeline-year">2019</div><div class="timeline-title">Fellowship in Interventional Cardiology</div><div class="timeline-place">Apollo Hospitals, New Delhi, India</div></div>
+    <div class="timeline-item"><div class="timeline-year">2020 – Present</div><div class="timeline-title">Senior Consultant & Head of Cardiology</div><div class="timeline-place">Dhaka National Medical College Hospital</div></div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="section" id="reviews">
+  <div class="divider"></div>
+  <h2 class="section-title">What Patients Say</h2>
+  <p class="section-subtitle">Real feedback from real patients</p>
+  <div class="reviews-grid">
+    <div class="review-card"><div class="review-stars">★★★★★</div><p class="review-text">"Dr. Rahman is exceptionally kind and professional. He explained my heart condition clearly. I felt very comfortable during the consultation."</p><div class="review-author">— Karim Hossain, Dhaka</div></div>
+    <div class="review-card"><div class="review-stars">★★★★★</div><p class="review-text">"Booking was super easy. The online consultation saved me hours of travel. Doctor was attentive and gave a complete treatment plan."</p><div class="review-author">— Fatema Begum, Chittagong</div></div>
+    <div class="review-card"><div class="review-stars">★★★★⭐</div><p class="review-text">"My father had severe chest pain. We booked an emergency appointment within minutes. Dr. Rahman's quick diagnosis was a lifesaver."</p><div class="review-author">— Arif Khan, Sylhet</div></div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<div class="contact-bar" id="contact">
+  <div class="contact-item"><div class="contact-icon">📍</div><div><div class="contact-label">Chamber Address</div><div class="contact-value" id="contactAddress">Dhaka National Medical College, Dhaka-1000</div></div></div>
+  <div class="contact-item"><div class="contact-icon">⏰</div><div><div class="contact-label">Chamber Hours</div><div class="contact-value" id="contactHours">Sat–Thu: 5PM – 9PM</div></div></div>
+  <div class="contact-item"><div class="contact-icon">📞</div><div><div class="contact-label">Phone</div><div class="contact-value" id="contactPhone">+880 1700-000000</div></div></div>
+  <div class="contact-item"><div class="contact-icon">🌐</div><div><div class="contact-label">Online Consultation</div><div class="contact-value">Available via Google Meet</div></div></div>
+</div>
+
+<footer>
+  <p>© 2025 <span id="footerName">Dr. Md. Abdur Rahman</span> | Designed with ❤️ for <span>Bangladesh</span></p>
+</footer>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeBooking()">✕</button>
+
+    <!-- STEP DOTS -->
+    <div class="steps">
+      <div class="step active" id="sd1"><div class="step-circle">1</div><div class="step-label">Your Info</div></div>
+      <div class="step"        id="sd2"><div class="step-circle">2</div><div class="step-label">Schedule</div></div>
+      <div class="step"        id="sd3"><div class="step-circle">3</div><div class="step-label">Payment</div></div>
+    </div>
+
+    <!-- STEP 1: Patient Info -->
+    <div id="step1">
+      <h2>Your Information</h2>
+      <p class="modal-subtitle">Fill in your details accurately</p>
+      <div class="form-row">
+        <div class="form-group"><label>Full Name *</label><input type="text" id="ptName" placeholder="আপনার নাম"/></div>
+        <div class="form-group"><label>Age *</label><input type="number" id="ptAge" placeholder="বয়স"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Phone *</label><input type="tel" id="ptPhone" placeholder="01XXXXXXXXX"/></div>
+        <div class="form-group"><label>Gender *</label><select id="ptGender"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+      </div>
+      <div class="form-group"><label>Chief Complaint *</label><textarea id="ptComplaint" rows="3" placeholder="আপনার সমস্যার বিবরণ দিন..."></textarea></div>
+      <div class="form-group">
+        <label>Consultation Type *</label>
+        <select id="consultType" onchange="updateFee()">
+          <option value="online">🖥️ Online (Google Meet) — ৳<span id="feeOnlineTxt">800</span></option>
+          <option value="chamber">🏥 Chamber Visit — ৳<span id="feeChamberTxt">1200</span></option>
+          <option value="urgent">🚨 Urgent Consultation — ৳<span id="feeUrgentTxt">1500</span></option>
+        </select>
+      </div>
+      <button class="btn-primary" onclick="goStep(2)">Continue →</button>
+    </div>
+
+    <!-- STEP 2: Date & Time -->
+    <div id="step2" style="display:none">
+      <h2>Pick Date & Time</h2>
+      <p class="modal-subtitle" id="schedSubtitle">Available slots for appointment</p>
+      <div class="form-row">
+        <div class="form-group"><label>Preferred Date *</label><input type="date" id="aptDate"/></div>
+        <div class="form-group"><label>Preferred Time *</label><select id="aptTime" id="aptTime2"></select></div>
+      </div>
+      <div class="form-group"><label>Medical Reports (optional)</label><input type="file" accept=".pdf,.jpg,.png"/></div>
+      <div class="fee-box">
+        <div class="fee-row"><span>Consultation Fee</span><span id="feeDisplay">৳800</span></div>
+        <div class="fee-row"><span>Platform Charge</span><span>৳0</span></div>
+        <div class="fee-row total"><span>Total Payable</span><span id="totalDisplay">৳800</span></div>
+      </div>
+      <button class="btn-primary" onclick="goStep(3)">Proceed to Payment →</button>
+      <button class="btn-secondary" onclick="goStep(1)">← Back</button>
+    </div>
+
+    <!-- STEP 3: Payment -->
+    <div id="step3" style="display:none">
+      <h2>Payment</h2>
+      <p class="modal-subtitle">Choose your method — 100% secure</p>
+      <div class="payment-methods">
+        <div class="pay-method selected" onclick="selectPay('bkash')" id="pm-bkash"><div class="pay-icon">📱</div><div class="pay-name">bKash</div><div class="pay-sub">Mobile Banking</div></div>
+        <div class="pay-method" onclick="selectPay('nagad')" id="pm-nagad"><div class="pay-icon">💳</div><div class="pay-name">Nagad</div><div class="pay-sub">Mobile Banking</div></div>
+        <div class="pay-method" onclick="selectPay('bank')" id="pm-bank"><div class="pay-icon">🏦</div><div class="pay-name">Bank Transfer</div><div class="pay-sub">DBBL / Dutch-Bangla</div></div>
+        <div class="pay-method" onclick="selectPay('card')" id="pm-card"><div class="pay-icon">💳</div><div class="pay-name">Visa / Mastercard</div><div class="pay-sub">Debit or Credit Card</div></div>
+      </div>
+
+      <!-- bKash -->
+      <div class="payment-detail active" id="det-bkash">
+        <div class="fee-box">
+          <p style="font-size:13px;color:var(--text-mid);margin-bottom:10px;">Send payment to bKash: <strong id="bkashNum">01700-000000</strong></p>
+          <div class="form-group"><label>Your bKash Number *</label><input type="tel" placeholder="01XXXXXXXXX"/></div>
+          <div class="form-group"><label>Transaction ID *</label><input type="text" placeholder="e.g. 8ABC123DEF"/></div>
+        </div>
+      </div>
+
+      <!-- Nagad -->
+      <div class="payment-detail" id="det-nagad">
+        <div class="fee-box">
+          <p style="font-size:13px;color:var(--text-mid);margin-bottom:10px;">Send payment to Nagad: <strong>01700-000000</strong></p>
+          <div class="form-group"><label>Your Nagad Number *</label><input type="tel" placeholder="01XXXXXXXXX"/></div>
+          <div class="form-group"><label>Transaction ID *</label><input type="text" placeholder="NAGAD-XXXX"/></div>
+        </div>
+      </div>
+
+      <!-- Bank -->
+      <div class="payment-detail" id="det-bank">
+        <div class="fee-box">
+          <p style="font-size:13px;color:var(--text-mid);margin-bottom:12px;">
+            <strong>Bank Details:</strong><br/>
+            Bank: Dutch-Bangla Bank (DBBL)<br/>
+            A/C Name: <span id="bankAccName">Dr. Md. Abdur Rahman</span><br/>
+            A/C No: 1234567890 | Routing: 090261XXX
+          </p>
+          <div class="form-group"><label>Transaction Reference *</label><input type="text" placeholder="Bank reference number"/></div>
+        </div>
+      </div>
+
+      <!-- Card -->
+      <div class="payment-detail" id="det-card">
+        <div class="form-group"><label>Card Number *</label><input type="text" placeholder="1234 5678 9012 3456" maxlength="19"/></div>
+        <div class="form-row">
+          <div class="form-group"><label>Expiry *</label><input type="text" placeholder="MM/YY" maxlength="5"/></div>
+          <div class="form-group"><label>CVV *</label><input type="text" placeholder="123" maxlength="3"/></div>
+        </div>
+        <div class="form-group"><label>Cardholder Name *</label><input type="text" placeholder="Name as on card"/></div>
+      </div>
+
+      <button class="btn-primary" onclick="confirmBooking()" style="margin-top:10px;">✅ Confirm & Pay <span id="payAmountBtn">৳800</span></button>
+      <button class="btn-secondary" onclick="goStep(2)">← Back</button>
+    </div>
+
+    <!-- SUCCESS -->
+    <div id="stepSuccess" style="display:none">
+      <div class="success-screen">
+        <div class="success-icon">🎉</div>
+        <h3>Booking Confirmed!</h3>
+        <p>Your appointment has been submitted. The doctor will review and confirm within <strong>30 minutes</strong>. You will receive a call/SMS.</p>
+        <div class="booking-ref" id="bookingRef">REF: DR-2025-XXXX</div>
+        <p style="font-size:13px;margin-bottom:10px;">After the doctor accepts, your Google Meet link will be sent via SMS:</p>
+        <button class="meet-link-btn" onclick="joinMeet()">🎥 Join Google Meet (After Confirmation)</button>
+        <br/><br/>
+        <button class="btn-secondary" onclick="closeBooking()" style="width:auto;padding:10px 24px;">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- JAVASCRIPT -->
+<script>
+/* ──────────────────────────────
+   STORAGE READER
+   Reads data saved by the doctor dashboard
+   Key prefix: "dr_"
+────────────────────────────── */
+function load(key, fallback) {
+  try {
+    const r = localStorage.getItem('dr_' + key);
+    return r === null ? fallback : JSON.parse(r);
+  } catch(e) { return fallback; }
+}
+
+function save(key, val) {
+  localStorage.setItem('dr_' + key, JSON.stringify(val));
+}
+
+/* ──────────────────────────────
+   DEFAULT DATA (used if doctor hasn't set up dashboard yet)
+────────────────────────────── */
+const DEF_PROFILE = {
+  name:'Dr. Md. Abdur Rahman', title:'Senior Consultant',
+  degrees:'MBBS (Dhaka Medical College) | MD – Internal Medicine | FCPS – Cardiology',
+  spec:'Cardiology, Internal Medicine', phone:'+880 1700-000000',
+  address:'Dhaka National Medical College, Dhaka-1000',
+  experience:15, patients:'8,000+',
+  feeOnline:800, feeChamber:1200, feeUrgent:1500
+};
+
+const DEF_EXPERTISE = [
+  {icon:'❤️', title:'Cardiology',            desc:'Heart disease diagnosis, ECG, echocardiography, hypertension and arrhythmia management.'},
+  {icon:'🫁', title:'Respiratory Medicine',  desc:'Asthma, COPD, pneumonia and other lung-related conditions.'},
+  {icon:'🩸', title:'Diabetes Management',   desc:'Comprehensive diabetic care including insulin therapy and HbA1c monitoring.'},
+  {icon:'🧠', title:'Neurology',             desc:'Headache, migraine, vertigo and early stroke detection.'},
+  {icon:'🦠', title:'Infectious Diseases',   desc:'Fever, dengue, typhoid, hepatitis and post-COVID complications.'},
+  {icon:'💊', title:'Preventive Healthcare', desc:'Health screenings, lifestyle advice and vaccination planning.'}
+];
+
+const DEF_SCHEDULE = { start:'17:00', end:'21:00', days:'Sat–Thu', max:12, meetLink:'https://meet.google.com/your-link' };
+
+/* ──────────────────────────────
+   POPULATE PAGE FROM LOCALSTORAGE
+   This runs on page load and reads
+   whatever the doctor saved in the dashboard
+────────────────────────────── */
+function populatePage() {
+  const p = load('profile', DEF_PROFILE);
+  const e = load('expertise', DEF_EXPERTISE);
+  const s = load('schedule', DEF_SCHEDULE);
+
+  // ── Update hero section ──
+  document.getElementById('heroName').textContent    = p.name     || DEF_PROFILE.name;
+  document.getElementById('heroDegrees').textContent = p.degrees  || DEF_PROFILE.degrees;
+  document.getElementById('heroExp').textContent     = (p.experience || DEF_PROFILE.experience) + '+';
+  document.getElementById('heroPatients').textContent= p.patients || DEF_PROFILE.patients;
+  document.getElementById('navName').textContent     = (p.name || DEF_PROFILE.name).replace('Dr. ', '').split(' ')[0];
+  document.getElementById('footerName').textContent  = p.name || DEF_PROFILE.name;
+  document.title = (p.name || DEF_PROFILE.name) + ' | Specialist Physician';
+
+  // ── Update badges ──
+  const specs = (p.spec || DEF_PROFILE.spec).split(',').map(s => s.trim());
+  const badgeIcons = ['❤️','🩺','🏥','⭐','💊'];
+  const badgesEl = document.getElementById('heroBadges');
+  badgesEl.innerHTML = specs.map((s,i) => `<span class="badge">${badgeIcons[i]||'🔬'} ${s}</span>`).join('') +
+    `<span class="badge">🇧🇩 BSMMU Certified</span>`;
+
+  // ── Update book button with live fees ──
+  const feeOnline = p.feeOnline || DEF_PROFILE.feeOnline;
+  document.getElementById('bookBtn').textContent = `📅 Book Appointment — ৳${feeOnline}`;
+
+  // ── Update consultation type options with live fees ──
+  document.getElementById('consultType').innerHTML = `
+    <option value="online">🖥️ Online (Google Meet) — ৳${p.feeOnline || DEF_PROFILE.feeOnline}</option>
+    <option value="chamber">🏥 Chamber Visit — ৳${p.feeChamber || DEF_PROFILE.feeChamber}</option>
+    <option value="urgent">🚨 Urgent Consultation — ৳${p.feeUrgent || DEF_PROFILE.feeUrgent}</option>
+  `;
+
+  // ── Update contact section ──
+  document.getElementById('contactAddress').textContent = p.address || DEF_PROFILE.address;
+  document.getElementById('contactPhone').textContent   = p.phone   || DEF_PROFILE.phone;
+  const startH = s.start ? formatTime(s.start) : '5PM';
+  const endH   = s.end   ? formatTime(s.end)   : '9PM';
+  document.getElementById('contactHours').textContent   = `${s.days || DEF_SCHEDULE.days}: ${startH} – ${endH}`;
+
+  // ── Bank account name ──
+  document.getElementById('bankAccName').textContent = p.name || DEF_PROFILE.name;
+
+  // ── Update expertise cards ──
+  const grid = document.getElementById('expertiseGrid');
+  grid.innerHTML = e.map(item => `
+    <div class="expertise-card">
+      <div class="expertise-icon">${item.icon}</div>
+      <h3>${item.title}</h3>
+      <p>${item.desc}</p>
+    </div>`).join('');
+
+  // ── Build time slots from schedule ──
+  buildTimeSlots(s);
+
+  // ── Update fee displays ──
+  updateFee();
+}
+
+function formatTime(t) {
+  // "17:00" → "5PM"
+  const [h, m] = t.split(':').map(Number);
+  const suffix = h >= 12 ? 'PM' : 'AM';
+  const hour   = h > 12 ? h - 12 : h;
+  return m > 0 ? `${hour}:${String(m).padStart(2,'0')}${suffix}` : `${hour}${suffix}`;
+}
+
+function buildTimeSlots(s) {
+  const select = document.getElementById('aptTime');
+  select.innerHTML = '';
+  let [sh, sm] = (s.start || '17:00').split(':').map(Number);
+  let [eh, em] = (s.end   || '21:00').split(':').map(Number);
+  while (sh < eh || (sh === eh && sm < em)) {
+    const suffix = sh >= 12 ? 'PM' : 'AM';
+    const hr     = sh > 12 ? sh - 12 : sh;
+    const label  = `${hr}:${String(sm).padStart(2,'0')} ${suffix}`;
+    select.innerHTML += `<option>${label}</option>`;
+    sm += 30;
+    if (sm >= 60) { sm -= 60; sh++; }
+  }
+}
+
+/* ──────────────────────────────
+   FEE CALCULATION
+────────────────────────────── */
+const fees = { online: 800, chamber: 1200, urgent: 1500 };
+
+function updateFee() {
+  const p = load('profile', DEF_PROFILE);
+  fees.online  = p.feeOnline  || 800;
+  fees.chamber = p.feeChamber || 1200;
+  fees.urgent  = p.feeUrgent  || 1500;
+  const type = document.getElementById('consultType').value;
+  const fee  = fees[type] || 800;
+  document.getElementById('feeDisplay').textContent   = '৳' + fee;
+  document.getElementById('totalDisplay').textContent = '৳' + fee;
+  document.getElementById('payAmountBtn').textContent = '৳' + fee;
+}
+
+/* ──────────────────────────────
+   MODAL OPEN / CLOSE
+────────────────────────────── */
+function openBooking() {
+  document.getElementById('bookingModal').classList.add('active');
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('aptDate').min = today;
+  goStep(1);
+}
+
+function closeBooking() {
+  document.getElementById('bookingModal').classList.remove('active');
+}
+
+document.getElementById('bookingModal').addEventListener('click', function(e) {
+  if (e.target === this) closeBooking();
+});
+
+/* ──────────────────────────────
+   STEP NAVIGATION
+────────────────────────────── */
+function goStep(n) {
+  if (n === 2 && !validateStep1()) return;
+  if (n === 3 && !validateStep2()) return;
+
+  ['step1','step2','step3','stepSuccess'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+
+  if (n === 'success') {
+    document.getElementById('stepSuccess').style.display = 'block';
+  } else {
+    document.getElementById('step' + n).style.display = 'block';
+  }
+
+  for (let i = 1; i <= 3; i++) {
+    const dot = document.getElementById('sd' + i);
+    dot.classList.remove('active','done');
+    if (i < n)  dot.classList.add('done');
+    if (i === n) dot.classList.add('active');
+  }
+}
+
+/* ──────────────────────────────
+   VALIDATION
+────────────────────────────── */
+function validateStep1() {
+  const name      = document.getElementById('ptName').value.trim();
+  const phone     = document.getElementById('ptPhone').value.trim();
+  const complaint = document.getElementById('ptComplaint').value.trim();
+  if (!name || !phone || !complaint) {
+    alert('Please fill in Name, Phone, and Chief Complaint.');
+    return false;
+  }
+  return true;
+}
+
+function validateStep2() {
+  if (!document.getElementById('aptDate').value) {
+    alert('Please select a preferred date.');
+    return false;
+  }
+  return true;
+}
+
+/* ──────────────────────────────
+   PAYMENT METHOD SELECTION
+────────────────────────────── */
+function selectPay(method) {
+  document.querySelectorAll('.pay-method').forEach(el => el.classList.remove('selected'));
+  document.querySelectorAll('.payment-detail').forEach(el => el.classList.remove('active'));
+  document.getElementById('pm-' + method).classList.add('selected');
+  document.getElementById('det-' + method).classList.add('active');
+}
+
+/* ──────────────────────────────
+   CONFIRM BOOKING
+   Saves the new appointment to localStorage
+   so the doctor can see it immediately!
+────────────────────────────── */
+function confirmBooking() {
+  const ref  = 'DR-2025-' + Math.floor(Math.random() * 9000 + 1000);
+  const type = document.getElementById('consultType').value;
+  const fee  = fees[type] || 800;
+  const typeLabel = { online:'Online', chamber:'Chamber', urgent:'Urgent' }[type];
+
+  // Find selected payment method
+  const selected = document.querySelector('.pay-method.selected .pay-name');
+  const payMethod = selected ? selected.textContent : 'bKash';
+
+  // Build new appointment object
+  const newApt = {
+    ref:       ref,
+    name:      document.getElementById('ptName').value,
+    age:       parseInt(document.getElementById('ptAge').value) || 0,
+    phone:     document.getElementById('ptPhone').value,
+    date:      document.getElementById('aptDate').value,
+    time:      document.getElementById('aptTime').value,
+    type:      typeLabel,
+    fee:       fee,
+    payment:   payMethod,
+    txid:      'TXN-' + Math.random().toString(36).substr(2,8).toUpperCase(),
+    status:    'pending',   // doctor will accept/reject in dashboard
+    complaint: document.getElementById('ptComplaint').value,
+  };
+
+  // Save to localStorage — doctor dashboard will pick this up!
+  const apts = load('appointments', []);
+  apts.unshift(newApt); // add to top
+  save('appointments', apts);
+
+  // Show success
+  document.getElementById('bookingRef').textContent = 'REF: ' + ref;
+  goStep('success');
+}
+
+/* ──────────────────────────────
+   JOIN MEET
+────────────────────────────── */
+function joinMeet() {
+  const s = load('schedule', DEF_SCHEDULE);
+  window.open(s.meetLink || 'https://meet.google.com', '_blank');
+}
+
+/* ──────────────────────────────
+   RUN ON PAGE LOAD
+────────────────────────────── */
+populatePage();
+
+/* Also listen for storage changes from the dashboard
+   (works if both files open in same browser) */
+window.addEventListener('storage', function(e) {
+  if (e.key && e.key.startsWith('dr_')) {
+    populatePage(); // refresh page data live!
+  }
+});
+</script>
+</body>
+</html>

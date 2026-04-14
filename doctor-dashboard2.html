@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Doctor Dashboard — Dr. Rahman</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --primary: #1a4f6e; --primary-light: #2a7da8; --accent: #e8a020;
+      --sidebar-bg: #0f2d42; --bg: #f0f4f8; --border: #dce8f0;
+      --text-dark: #1a2c3d; --text-mid: #4a6070; --text-light: #8aabb8;
+      --success: #27ae60; --warning: #f39c12; --danger: #e74c3c; --info: #3498db;
+      --radius: 14px; --shadow: 0 2px 16px rgba(26,79,110,0.08);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text-dark); }
+    h1,h2,h3 { font-family:'Playfair Display',serif; }
+
+    /* ── LOGIN PAGE ── */
+    #loginPage {
+      min-height:100vh; display:flex; align-items:center; justify-content:center;
+      background:linear-gradient(135deg,#0f2d42 0%,#1a4f6e 60%,#2a7da8 100%);
+      padding:20px;
+    }
+    .login-card {
+      background:white; border-radius:24px; padding:50px 44px;
+      width:100%; max-width:420px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.25);
+      animation:slideUp .5s ease;
+    }
+    @keyframes slideUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+    .login-logo { text-align:center; margin-bottom:32px; }
+    .login-logo .logo-icon { font-size:56px; display:block; margin-bottom:10px; }
+    .login-logo h2 { font-size:26px; color:var(--primary); }
+    .login-logo p  { font-size:13px; color:var(--text-mid); margin-top:4px; }
+    .login-error {
+      background:#fdecea; color:var(--danger);
+      border-radius:10px; padding:12px 16px; font-size:13px;
+      margin-bottom:16px; display:none;
+      border-left:4px solid var(--danger);
+    }
+    .lg-group { margin-bottom:18px; }
+    .lg-group label { display:block; font-size:13px; font-weight:600; color:var(--text-dark); margin-bottom:7px; }
+    .lg-group .input-wrap { position:relative; }
+    .lg-group .input-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:16px; color:var(--text-light); }
+    .lg-group input {
+      width:100%; padding:13px 14px 13px 42px;
+      border:2px solid var(--border); border-radius:11px;
+      font-size:14px; font-family:'DM Sans',sans-serif; color:var(--text-dark);
+      transition:border-color .2s;
+    }
+    .lg-group input:focus { outline:none; border-color:var(--primary-light); }
+    .show-pass-btn { position:absolute; right:14px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:16px; color:var(--text-light); }
+    .btn-login {
+      width:100%; background:var(--primary); color:white;
+      padding:14px; border:none; border-radius:11px;
+      font-size:15px; font-weight:700; font-family:'DM Sans',sans-serif;
+      cursor:pointer; transition:background .2s; margin-top:4px;
+    }
+    .btn-login:hover { background:var(--primary-light); }
+    .login-hint { text-align:center; margin-top:20px; font-size:12px; color:var(--text-light); background:var(--bg); border-radius:8px; padding:10px; }
+    .login-hint strong { color:var(--text-mid); }
+
+    /* ── DASHBOARD LAYOUT ── */
+    #dashboardPage { display:none; }
+    .dash-wrap { display:flex; min-height:100vh; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width:250px; background:var(--sidebar-bg); color:white;
+      display:flex; flex-direction:column;
+      position:fixed; top:0; left:0; bottom:0; z-index:100;
+    }
+    .sidebar-logo { padding:24px 20px; border-bottom:1px solid rgba(255,255,255,.1); font-family:'Playfair Display',serif; font-size:18px; }
+    .sidebar-logo span { color:var(--accent); }
+    .sidebar-logo small { display:block; font-size:11px; opacity:.6; margin-top:3px; font-family:'DM Sans',sans-serif; }
+    .sb-menu { list-style:none; padding:14px 0; flex:1; overflow-y:auto; }
+    .sb-menu li a {
+      display:flex; align-items:center; gap:12px;
+      padding:12px 20px; color:rgba(255,255,255,.7);
+      font-size:14px; font-weight:500; cursor:pointer;
+      border-left:3px solid transparent; transition:all .2s;
+    }
+    .sb-menu li a:hover { background:rgba(255,255,255,.07); color:white; }
+    .sb-menu li a.active { background:#1a4f6e; color:white; border-left-color:var(--accent); }
+    .sb-label { padding:14px 20px 5px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:rgba(255,255,255,.3); }
+    .sidebar-bottom { padding:16px 20px; border-top:1px solid rgba(255,255,255,.1); }
+    .doc-mini { display:flex; align-items:center; gap:10px; }
+    .doc-mini-av { width:36px; height:36px; background:var(--primary-light); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; }
+    .doc-mini-name { font-size:13px; font-weight:600; }
+    .doc-mini-role { font-size:11px; opacity:.6; }
+    .btn-logout {
+      display:flex; align-items:center; gap:8px; margin-top:12px;
+      background:rgba(231,76,60,.15); color:#ff8a80; border:none;
+      border-radius:8px; padding:9px 14px; font-size:13px; font-weight:600;
+      cursor:pointer; width:100%; font-family:'DM Sans',sans-serif;
+      transition:background .2s;
+    }
+    .btn-logout:hover { background:rgba(231,76,60,.3); }
+
+    /* MAIN */
+    .main { margin-left:250px; flex:1; display:flex; flex-direction:column; }
+    .topbar {
+      background:white; padding:16px 28px;
+      display:flex; align-items:center; justify-content:space-between;
+      box-shadow:0 2px 12px rgba(0,0,0,.06);
+      position:sticky; top:0; z-index:50;
+    }
+    .topbar-title { font-size:20px; font-weight:700; color:var(--primary); }
+    .topbar-right { display:flex; align-items:center; gap:14px; }
+    .topbar-date { font-size:13px; color:var(--text-mid); }
+    .live-badge { background:#e8f8ef; color:var(--success); font-size:12px; font-weight:600; padding:5px 12px; border-radius:50px; border:1px solid #b8e8cb; }
+    .notif-btn { background:var(--bg); border:none; cursor:pointer; width:40px; height:40px; border-radius:10px; font-size:18px; position:relative; }
+    .notif-badge { position:absolute; top:-4px; right:-4px; background:var(--danger); color:white; font-size:10px; font-weight:700; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+
+    /* PAGES */
+    .page { display:none; padding:28px; }
+    .page.active { display:block; }
+
+    /* STAT CARDS */
+    .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:18px; margin-bottom:28px; }
+    .stat-card { background:white; border-radius:var(--radius); padding:22px; box-shadow:var(--shadow); display:flex; align-items:center; gap:16px; }
+    .stat-icon { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
+    .stat-icon.blue   { background:#e8f4fd; }
+    .stat-icon.green  { background:#e8f8ef; }
+    .stat-icon.orange { background:#fef5e7; }
+    .stat-num   { font-size:28px; font-weight:700; font-family:'Playfair Display',serif; }
+    .stat-label { font-size:12px; color:var(--text-mid); margin-top:2px; }
+
+    /* CARD */
+    .card { background:white; border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:24px; overflow:hidden; }
+    .card-header { padding:18px 22px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .card-header h3 { font-size:16px; font-weight:700; }
+    .card-body { padding:22px; }
+
+    /* TABLE */
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; font-size:14px; }
+    table th { background:var(--bg); color:var(--text-mid); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.5px; padding:12px 16px; text-align:left; }
+    table td { padding:13px 16px; border-bottom:1px solid var(--border); vertical-align:middle; }
+    table tr:last-child td { border-bottom:none; }
+    table tr:hover td { background:#f8fbfd; }
+    .empty-row td { text-align:center; color:var(--text-light); padding:24px; }
+
+    /* BADGES */
+    .badge-status { padding:4px 12px; border-radius:50px; font-size:12px; font-weight:600; display:inline-block; }
+    .badge-pending   { background:#fef5e7; color:var(--warning); }
+    .badge-accepted  { background:#e8f8ef; color:var(--success); }
+    .badge-rejected  { background:#fdecea; color:var(--danger); }
+    .badge-completed { background:#e8f4fd; color:var(--info);    }
+
+    /* BUTTONS */
+    .btn-accept  { background:var(--success); color:white; border:none; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; margin-right:4px; }
+    .btn-reject  { background:var(--danger);  color:white; border:none; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; }
+    .btn-meet    { background:#0F9D58;         color:white; border:none; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; }
+    .btn-view    { background:var(--info);     color:white; border:none; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; }
+    .btn-primary { background:var(--primary); color:white; padding:10px 22px; border-radius:10px; border:none; font-weight:600; font-size:14px; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background .2s; }
+    .btn-primary:hover { background:var(--primary-light); }
+    .btn-outline { background:none; color:var(--primary); padding:10px 22px; border-radius:10px; border:2px solid var(--primary); font-weight:600; font-size:14px; cursor:pointer; font-family:'DM Sans',sans-serif; }
+
+    /* FORMS */
+    .form-group { margin-bottom:16px; }
+    .form-group label { display:block; font-size:13px; font-weight:600; color:var(--text-dark); margin-bottom:6px; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width:100%; padding:11px 14px;
+      border:2px solid var(--border); border-radius:10px;
+      font-size:14px; font-family:'DM Sans',sans-serif; color:var(--text-dark);
+      background:white; transition:border-color .2s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline:none; border-color:var(--primary-light); }
+    .form-row   { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .form-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+
+    /* SAVE NOTICE */
+    .save-notice { background:#e8f8ef; border:1px solid #b8e8cb; border-radius:10px; padding:12px 16px; font-size:13px; color:var(--success); margin-top:12px; display:none; }
+
+    /* EXPERTISE EDITOR */
+    .exp-item { background:var(--bg); border-radius:12px; padding:16px; margin-bottom:12px; border:2px solid var(--border); position:relative; }
+    .exp-item .remove-btn { position:absolute; top:12px; right:12px; background:var(--danger); color:white; border:none; border-radius:6px; padding:4px 10px; font-size:12px; cursor:pointer; }
+
+    /* SCHEDULE GRID */
+    .sched-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:10px; }
+    .sched-day  { background:var(--bg); border-radius:12px; padding:14px 10px; text-align:center; }
+    .sched-day.today { background:var(--primary); color:white; }
+    .sched-day .dy-name  { font-size:11px; opacity:.7; margin-bottom:4px; }
+    .sched-day .dy-num   { font-size:22px; font-weight:700; }
+    .sched-day .dy-count { font-size:11px; margin-top:6px; background:rgba(255,255,255,.2); border-radius:50px; padding:2px 8px; }
+
+    /* PROFILE HEADER */
+    .prof-av-sec { text-align:center; padding:30px; border-bottom:1px solid var(--border); }
+    .prof-av { width:100px; height:100px; background:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:48px; margin:0 auto 12px; }
+    .prof-name { font-size:22px; font-weight:700; }
+    .prof-role { color:var(--text-mid); font-size:14px; }
+
+    /* PASSWORD SECTION */
+    .pw-section { border-top:2px solid var(--border); margin-top:24px; padding-top:24px; }
+
+    /* MODAL */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:200; align-items:center; justify-content:center; padding:20px; }
+    .modal-overlay.active { display:flex; }
+    .modal-box { background:white; border-radius:20px; width:100%; max-width:520px; padding:32px; position:relative; max-height:90vh; overflow-y:auto; }
+    .modal-box h3 { font-size:20px; margin-bottom:20px; color:var(--primary); }
+    .detail-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); font-size:14px; }
+    .detail-row:last-child { border-bottom:none; }
+    .detail-label { color:var(--text-mid); }
+    .detail-value { font-weight:600; }
+    .modal-close-btn { position:absolute; top:16px; right:16px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-mid); }
+
+    /* TOAST */
+    .toast { position:fixed; bottom:24px; right:24px; background:var(--text-dark); color:white; padding:14px 22px; border-radius:12px; font-size:14px; font-weight:500; z-index:9999; transform:translateY(100px); opacity:0; transition:all .3s; max-width:340px; }
+    .toast.show { transform:translateY(0); opacity:1; }
+    .toast.success { background:var(--success); }
+    .toast.danger  { background:var(--danger);  }
+
+    @media(max-width:768px) {
+      .sidebar { width:60px; }
+      .sidebar .sidebar-logo small, .sb-menu .menu-text, .sb-label, .doc-mini-name, .doc-mini-role, .btn-logout span { display:none; }
+      .main { margin-left:60px; }
+      .sched-grid { grid-template-columns:repeat(4,1fr); }
+      .form-row, .form-row-3 { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════
+     LOGIN PAGE
+════════════════════════════════════ -->
+<div id="loginPage">
+  <div class="login-card">
+    <div class="login-logo">
+      <span class="logo-icon">🏥</span>
+      <h2>Doctor Dashboard</h2>
+      <p>Secure sign-in to manage your practice</p>
+    </div>
+
+    <div class="login-error" id="loginError">❌ Incorrect username or password.</div>
+
+    <div class="lg-group">
+      <label>Username</label>
+      <div class="input-wrap">
+        <span class="input-icon">👤</span>
+        <input type="text" id="loginUser" placeholder="Enter username" autocomplete="username"/>
+      </div>
+    </div>
+
+    <div class="lg-group">
+      <label>Password</label>
+      <div class="input-wrap">
+        <span class="input-icon">🔒</span>
+        <input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+        <button class="show-pass-btn" type="button" onclick="togglePass()" title="Toggle password">👁️</button>
+      </div>
+    </div>
+
+    <button class="btn-login" onclick="doLogin()">Sign In →</button>
+
+    <!-- Demo hint — remove this in real deployment! -->
+    <div class="login-hint">
+      <strong>Demo login:</strong><br/>
+      Username: <strong>drrahman</strong> &nbsp;|&nbsp; Password: <strong>doctor123</strong>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     DASHBOARD
+════════════════════════════════════ -->
+<div id="dashboardPage">
+<div class="dash-wrap">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">Dr.<span>Rahman</span><small>Doctor Dashboard</small></div>
+    <ul class="sb-menu">
+      <li><div class="sb-label">Main</div></li>
+      <li><a onclick="showPage('dashboard')"     class="active" id="menu-dashboard">    <span>📊</span><span class="menu-text"> Dashboard</span></a></li>
+      <li><a onclick="showPage('appointments')"  id="menu-appointments">  <span>📅</span><span class="menu-text"> Appointments</span></a></li>
+      <li><a onclick="showPage('patients')"      id="menu-patients">      <span>👥</span><span class="menu-text"> Patients</span></a></li>
+      <li><a onclick="showPage('consultations')" id="menu-consultations"> <span>🎥</span><span class="menu-text"> Consultations</span></a></li>
+      <li><div class="sb-label">Payments</div></li>
+      <li><a onclick="showPage('payments')"      id="menu-payments">      <span>💰</span><span class="menu-text"> Payments</span></a></li>
+      <li><div class="sb-label">Manage</div></li>
+      <li><a onclick="showPage('schedule')"      id="menu-schedule">      <span>🗓️</span><span class="menu-text"> My Schedule</span></a></li>
+      <li><a onclick="showPage('prescriptions')" id="menu-prescriptions"> <span>📋</span><span class="menu-text"> Prescriptions</span></a></li>
+      <li><a onclick="showPage('expertise')"     id="menu-expertise">     <span>🏅</span><span class="menu-text"> Edit Expertise</span></a></li>
+      <li><a onclick="showPage('profile')"       id="menu-profile">       <span>⚙️</span><span class="menu-text"> Profile & Settings</span></a></li>
+    </ul>
+    <div class="sidebar-bottom">
+      <div class="doc-mini">
+        <div class="doc-mini-av">👨‍⚕️</div>
+        <div>
+          <div class="doc-mini-name" id="sidebarName">Dr. Rahman</div>
+          <div class="doc-mini-role" id="sidebarRole">Cardiologist</div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">🚪 <span>Logout</span></button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="pageTitle">Dashboard</div>
+      <div class="topbar-right">
+        <span class="live-badge">🟢 Live Sync ON</span>
+        <div class="topbar-date" id="currentDate"></div>
+        <button class="notif-btn">🔔<span class="notif-badge" id="notifCount">0</span></button>
+      </div>
+    </div>
+
+    <!-- ════ DASHBOARD ════ -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon blue">📅</div><div><div class="stat-num" id="st-total">0</div><div class="stat-label">Total Appointments</div></div></div>
+        <div class="stat-card"><div class="stat-icon orange">⏳</div><div><div class="stat-num" id="st-pending">0</div><div class="stat-label">Pending Review</div></div></div>
+        <div class="stat-card"><div class="stat-icon green">✅</div><div><div class="stat-num" id="st-accepted">0</div><div class="stat-label">Accepted</div></div></div>
+        <div class="stat-card"><div class="stat-icon blue">💰</div><div><div class="stat-num" id="st-earn">৳0</div><div class="stat-label">Total Earnings</div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>⏳ Pending Appointments — Needs Action</h3><button class="btn-primary" onclick="showPage('appointments')">View All</button></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Ref</th><th>Patient</th><th>Phone</th><th>Date & Time</th><th>Type</th><th>Fee & Payment</th><th>Action</th></tr></thead>
+          <tbody id="pendingBody"></tbody>
+        </table></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>📆 Today's Accepted Appointments</h3></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Time</th><th>Patient</th><th>Type</th><th>Action</th></tr></thead>
+          <tbody id="todayBody"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ════ APPOINTMENTS ════ -->
+    <div class="page" id="page-appointments">
+      <div class="card">
+        <div class="card-header">
+          <h3>📅 All Appointments</h3>
+          <select style="padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:13px;" onchange="renderAllApts(this.value)">
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="completed">Completed</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Ref</th><th>Patient</th><th>Phone</th><th>Date</th><th>Time</th><th>Type</th><th>Fee</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="allAptBody"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ════ PATIENTS ════ -->
+    <div class="page" id="page-patients">
+      <div class="card">
+        <div class="card-header">
+          <h3>👥 Patient Records</h3>
+          <input type="text" placeholder="🔍 Search..." style="padding:8px 14px;border:2px solid var(--border);border-radius:8px;font-size:13px;width:200px;" onkeyup="renderPatients(this.value)"/>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Name</th><th>Age</th><th>Phone</th><th>Last Visit</th><th>Visits</th><th>Complaint</th></tr></thead>
+          <tbody id="patientsBody"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ════ CONSULTATIONS ════ -->
+    <div class="page" id="page-consultations">
+      <div class="card">
+        <div class="card-header"><h3>🎥 Google Meet Link Settings</h3></div>
+        <div class="card-body">
+          <p style="color:var(--text-mid);font-size:14px;margin-bottom:16px;">This link is sent to patients when you accept their online appointment. It also appears on your patient website.</p>
+          <div class="form-group">
+            <label>Your Google Meet Link</label>
+            <input type="text" id="meetLinkInput" placeholder="https://meet.google.com/abc-xyz-def"/>
+          </div>
+          <button class="btn-primary" onclick="saveMeetLink()">💾 Save & Sync to Patient Site</button>
+          <div class="save-notice" id="meetNotice">✅ Meet link synced to patient website!</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Accepted Online Appointments</h3></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Patient</th><th>Date & Time</th><th>Meet Link</th><th>Action</th></tr></thead>
+          <tbody id="onlineBody"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ════ PAYMENTS ════ -->
+    <div class="page" id="page-payments">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon green">💰</div><div><div class="stat-num" id="pay-total">৳0</div><div class="stat-label">Total Received</div></div></div>
+        <div class="stat-card"><div class="stat-icon orange">⏳</div><div><div class="stat-num" id="pay-pend">৳0</div><div class="stat-label">Pending Verification</div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>💳 Payment History</h3></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Ref</th><th>Patient</th><th>Method</th><th>Amount</th><th>Txn ID</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody id="payBody"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ════ SCHEDULE ════ -->
+    <div class="page" id="page-schedule">
+      <div class="card">
+        <div class="card-header"><h3>🗓️ This Week's Appointments</h3></div>
+        <div class="card-body"><div class="sched-grid" id="schedGrid"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>⚙️ Chamber Hours (Synced to Patient Site)</h3></div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group"><label>Start Time</label><input type="time" id="schedStart"/></div>
+            <div class="form-group"><label>End Time</label><input type="time" id="schedEnd"/></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Working Days</label><input type="text" id="schedDays" placeholder="e.g. Sat–Thu"/></div>
+            <div class="form-group"><label>Max Patients/Day</label><input type="number" id="schedMax"/></div>
+          </div>
+          <button class="btn-primary" onclick="saveSchedule()">💾 Save & Sync to Patient Site</button>
+          <div class="save-notice" id="schedNotice">✅ Schedule synced!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ PRESCRIPTIONS ════ -->
+    <div class="page" id="page-prescriptions">
+      <div class="card">
+        <div class="card-header"><h3>📋 Write Prescription</h3></div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group"><label>Patient Name *</label><input type="text" id="rxName" placeholder="Full name"/></div>
+            <div class="form-group"><label>Age / Gender</label><input type="text" id="rxAge" placeholder="45 / Male"/></div>
+          </div>
+          <div class="form-group"><label>Diagnosis</label><textarea id="rxDiag" rows="2" placeholder="e.g. Hypertension, Type-2 Diabetes"></textarea></div>
+          <div class="form-group"><label>Medicines & Dose</label><textarea id="rxMeds" rows="5" placeholder="Medicine — Dose — Duration&#10;e.g. Amlodipine 5mg — 1 tablet daily — 1 month"></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Next Visit</label><input type="date" id="rxNext"/></div>
+            <div class="form-group"><label>Tests Advised</label><input type="text" id="rxTests" placeholder="ECG, CBC, RBS..."/></div>
+          </div>
+          <div class="form-group"><label>Doctor's Advice</label><textarea id="rxAdvice" rows="2" placeholder="Diet, rest, lifestyle..."></textarea></div>
+          <div style="display:flex;gap:10px;">
+            <button class="btn-primary" onclick="saveRx()">💾 Save Prescription</button>
+            <button class="btn-outline" onclick="window.print()">🖨️ Print</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>📂 Saved Prescriptions</h3></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Date</th><th>Patient</th><th>Diagnosis</th><th>Action</th></tr></thead>
+          <tbody id="rxListBody"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ════ EXPERTISE EDITOR ════ -->
+    <div class="page" id="page-expertise">
+      <div class="card">
+        <div class="card-header">
+          <h3>🏅 Edit Expertise Cards</h3>
+          <button class="btn-primary" onclick="addExpertise()">+ Add Card</button>
+        </div>
+        <div class="card-body">
+          <p style="color:var(--text-mid);font-size:14px;margin-bottom:16px;">Each card here appears on your patient website in real time when you save.</p>
+          <div id="expEditor"></div>
+          <button class="btn-primary" onclick="saveExpertise()">💾 Save All & Sync to Patient Site</button>
+          <div class="save-notice" id="expNotice">✅ Expertise cards synced to patient website!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ PROFILE & SETTINGS ════ -->
+    <div class="page" id="page-profile">
+      <div class="card">
+        <div class="prof-av-sec">
+          <div class="prof-av">👨‍⚕️</div>
+          <div class="prof-name" id="profDispName">Dr. Md. Abdur Rahman</div>
+          <div class="prof-role" id="profDispRole">Senior Consultant — Cardiology</div>
+        </div>
+        <div class="card-body">
+          <h3 style="margin-bottom:16px;">Edit Profile (Changes sync to patient website)</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Full Name</label><input type="text" id="pfName"/></div>
+            <div class="form-group"><label>Title / Designation</label><input type="text" id="pfTitle"/></div>
+          </div>
+          <div class="form-group"><label>Degrees</label><input type="text" id="pfDegrees" placeholder="MBBS | MD | FCPS..."/></div>
+          <div class="form-row">
+            <div class="form-group"><label>Specialization</label><input type="text" id="pfSpec"/></div>
+            <div class="form-group"><label>BMDC Reg. No.</label><input type="text" id="pfBmdc"/></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Phone</label><input type="tel" id="pfPhone"/></div>
+            <div class="form-group"><label>Chamber Address</label><input type="text" id="pfAddress"/></div>
+          </div>
+          <div class="form-group"><label>Short Bio (shown on patient site)</label><textarea id="pfBio" rows="3"></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Years Experience</label><input type="number" id="pfExp"/></div>
+            <div class="form-group"><label>Patients Treated</label><input type="text" id="pfPatCount" placeholder="e.g. 8,000+"/></div>
+          </div>
+          <div class="form-row-3">
+            <div class="form-group"><label>Online Fee (৳)</label><input type="number" id="pfFeeOnline"/></div>
+            <div class="form-group"><label>Chamber Fee (৳)</label><input type="number" id="pfFeeChamber"/></div>
+            <div class="form-group"><label>Urgent Fee (৳)</label><input type="number" id="pfFeeUrgent"/></div>
+          </div>
+          <button class="btn-primary" onclick="saveProfile()">💾 Save Profile & Sync to Patient Site</button>
+          <div class="save-notice" id="profNotice">✅ Profile synced to patient website!</div>
+
+          <!-- CHANGE PASSWORD -->
+          <div class="pw-section">
+            <h3 style="margin-bottom:16px;">🔒 Change Password</h3>
+            <div class="form-row">
+              <div class="form-group"><label>Current Password</label><input type="password" id="pwCurrent"/></div>
+              <div class="form-group"><label>New Password</label><input type="password" id="pwNew"/></div>
+            </div>
+            <div class="form-group"><label>Confirm New Password</label><input type="password" id="pwConfirm" style="max-width:300px;"/></div>
+            <button class="btn-primary" onclick="changePassword()">🔑 Update Password</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal-box">
+    <button class="modal-close-btn" onclick="closeModal()">✕</button>
+    <h3>📋 Appointment Details</h3>
+    <div id="detailContent"></div>
+    <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;">
+      <button class="btn-accept" onclick="acceptFromModal()">✓ Accept</button>
+      <button class="btn-reject" onclick="rejectFromModal()">✗ Reject</button>
+      <button class="btn-meet" onclick="openMeet()">🎥 Open Meet</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<!-- ════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════ -->
+<script>
+/* ──────────────────────────────
+   CREDENTIALS
+   Change username/password here.
+   In production: use a real server!
+────────────────────────────── */
+const USERNAME = 'drrahman';       // ← change this
+const DEFAULT_PASSWORD = 'doctor123'; // ← change this
+
+/* ──────────────────────────────
+   DEFAULT DATA (first-run only)
+────────────────────────────── */
+const DEF_PROFILE = {
+  name:'Dr. Md. Abdur Rahman', title:'Senior Consultant',
+  degrees:'MBBS (Dhaka Medical College) | MD – Internal Medicine | FCPS – Cardiology',
+  spec:'Cardiology, Internal Medicine', bmdc:'A-12345',
+  phone:'+880 1700-000000', address:'Dhaka National Medical College, Dhaka-1000',
+  bio:'Senior Consultant Cardiologist with 15+ years of experience in heart disease management and preventive healthcare.',
+  experience:15, patients:'8,000+',
+  feeOnline:800, feeChamber:1200, feeUrgent:1500
+};
+
+const DEF_EXPERTISE = [
+  {icon:'❤️', title:'Cardiology',            desc:'Heart disease diagnosis, ECG, echocardiography, hypertension and arrhythmia management.'},
+  {icon:'🫁', title:'Respiratory Medicine',  desc:'Asthma, COPD, pneumonia and other lung-related conditions.'},
+  {icon:'🩸', title:'Diabetes Management',   desc:'Comprehensive diabetic care including insulin therapy and HbA1c monitoring.'},
+  {icon:'🧠', title:'Neurology',             desc:'Headache, migraine, vertigo and early stroke detection.'},
+  {icon:'🦠', title:'Infectious Diseases',   desc:'Fever, dengue, typhoid, hepatitis and post-COVID complications.'},
+  {icon:'💊', title:'Preventive Healthcare', desc:'Health screenings, lifestyle advice and vaccination planning.'}
+];
+
+const DEF_SCHEDULE = { start:'17:00', end:'21:00', days:'Sat–Thu', max:12, meetLink:'https://meet.google.com/your-link' };
+
+const DEF_APPOINTMENTS = [
+  {ref:'DR-2025-1001', name:'Karim Hossain',  age:45, phone:'01711-111111', date:'2025-04-14', time:'5:00 PM', type:'Online',  fee:800,  payment:'bKash',     txid:'8ABC123DEF', status:'pending',   complaint:'Chest pain and shortness of breath'},
+  {ref:'DR-2025-1002', name:'Fatema Begum',   age:38, phone:'01722-222222', date:'2025-04-13', time:'5:00 PM', type:'Online',  fee:800,  payment:'Nagad',      txid:'NAGAD-5678', status:'accepted',  complaint:'High blood pressure, dizziness'},
+  {ref:'DR-2025-1003', name:'Arif Khan',      age:60, phone:'01733-333333', date:'2025-04-13', time:'6:30 PM', type:'Chamber', fee:1200, payment:'Bank',       txid:'DBBL-9012',  status:'accepted',  complaint:'Regular cardiac checkup'},
+  {ref:'DR-2025-1004', name:'Rina Akter',     age:52, phone:'01744-444444', date:'2025-04-12', time:'7:00 PM', type:'Online',  fee:800,  payment:'Visa Card',  txid:'VISA-3456',  status:'completed', complaint:'Diabetes management followup'},
+  {ref:'DR-2025-1005', name:'Mizanur Rahman', age:35, phone:'01755-555555', date:'2025-04-15', time:'8:00 PM', type:'Urgent',  fee:1500, payment:'Mastercard', txid:'MC-7890',    status:'pending',   complaint:'Severe palpitation since morning'},
+];
+
+/* ──────────────────────────────
+   STORAGE HELPERS
+   Every key is prefixed "dr_"
+   so it doesn't clash with other apps.
+────────────────────────────── */
+const save = (k, v) => localStorage.setItem('dr_' + k, JSON.stringify(v));
+const load = (k, fallback) => {
+  try { const r = localStorage.getItem('dr_' + k); return r === null ? fallback : JSON.parse(r); }
+  catch(e) { return fallback; }
+};
+
+/* First-run: seed defaults */
+function seedDefaults() {
+  if (!localStorage.getItem('dr_profile'))       save('profile', DEF_PROFILE);
+  if (!localStorage.getItem('dr_expertise'))     save('expertise', DEF_EXPERTISE);
+  if (!localStorage.getItem('dr_schedule'))      save('schedule', DEF_SCHEDULE);
+  if (!localStorage.getItem('dr_appointments'))  save('appointments', DEF_APPOINTMENTS);
+  if (!localStorage.getItem('dr_prescriptions')) save('prescriptions', []);
+  if (!localStorage.getItem('dr_password'))      save('password', DEFAULT_PASSWORD);
+}
+
+seedDefaults(); // always run on load
+
+/* ──────────────────────────────
+   LOGIN / LOGOUT
+────────────────────────────── */
+function doLogin() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const storedPass = load('password', DEFAULT_PASSWORD);
+
+  if (user === USERNAME && pass === storedPass) {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('dashboardPage').style.display = 'block';
+    initDashboard();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('loginPass').value = '';
+    setTimeout(() => document.getElementById('loginError').style.display = 'none', 4000);
+  }
+}
+
+function doLogout() {
+  if (!confirm('Logout from dashboard?')) return;
+  document.getElementById('dashboardPage').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+function togglePass() {
+  const i = document.getElementById('loginPass');
+  i.type = i.type === 'password' ? 'text' : 'password';
+}
+
+/* ──────────────────────────────
+   INIT DASHBOARD
+────────────────────────────── */
+function initDashboard() {
+  // Set date
+  document.getElementById('currentDate').textContent =
+    new Date().toLocaleDateString('en-BD', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+  // Load forms
+  loadProfileForm();
+  loadScheduleForm();
+  renderExpertiseEditor();
+  loadMeetLinkInput();
+  // Render all tables
+  renderAll();
+}
+
+function renderAll() {
+  renderPending();
+  renderToday();
+  renderAllApts('all');
+  renderPatients();
+  renderPayments();
+  renderOnline();
+  renderRxList();
+  renderSchedGrid();
+  updateStats();
+}
+
+/* ──────────────────────────────
+   NAVIGATION
+────────────────────────────── */
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-menu a').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('menu-' + name).classList.add('active');
+  const t = {dashboard:'Dashboard', appointments:'All Appointments', patients:'Patient Records',
+    consultations:'Consultations', payments:'Payment History', schedule:'My Schedule',
+    prescriptions:'Prescriptions', expertise:'Edit Expertise', profile:'Profile & Settings'};
+  document.getElementById('pageTitle').textContent = t[name] || name;
+}
+
+/* ──────────────────────────────
+   STATS
+────────────────────────────── */
+function updateStats() {
+  const apts = load('appointments', []);
+  const pending  = apts.filter(a => a.status === 'pending').length;
+  const accepted = apts.filter(a => a.status === 'accepted').length;
+  const earn     = apts.filter(a => a.status !== 'rejected').reduce((s,a) => s + a.fee, 0);
+  document.getElementById('st-total').textContent   = apts.length;
+  document.getElementById('st-pending').textContent = pending;
+  document.getElementById('st-accepted').textContent= accepted;
+  document.getElementById('st-earn').textContent    = '৳' + earn.toLocaleString();
+  document.getElementById('notifCount').textContent = pending;
+  if (document.getElementById('pay-total')) {
+    document.getElementById('pay-total').textContent = '৳' + earn.toLocaleString();
+    const pendPay = apts.filter(a=>a.status==='pending').reduce((s,a)=>s+a.fee,0);
+    document.getElementById('pay-pend').textContent  = '৳' + pendPay.toLocaleString();
+  }
+}
+
+/* ──────────────────────────────
+   APPOINTMENTS RENDERING
+────────────────────────────── */
+function renderPending() {
+  const list = load('appointments', []).filter(a => a.status === 'pending');
+  const body = document.getElementById('pendingBody');
+  if (!list.length) { body.innerHTML = '<tr class="empty-row"><td colspan="7">🎉 No pending appointments!</td></tr>'; return; }
+  body.innerHTML = list.map(a => `<tr>
+    <td><strong>${a.ref}</strong></td>
+    <td>${a.name}</td><td>${a.phone}</td>
+    <td>${a.date} — ${a.time}</td>
+    <td>${a.type}</td>
+    <td>৳${a.fee} via ${a.payment}</td>
+    <td>
+      <button class="btn-accept" onclick="acceptApt('${a.ref}')">✓ Accept</button>
+      <button class="btn-reject" onclick="rejectApt('${a.ref}')">✗ Reject</button>
+      <button class="btn-view"   onclick="viewDetail('${a.ref}')">View</button>
+    </td>
+  </tr>`).join('');
+}
+
+function renderToday() {
+  const today = new Date().toISOString().split('T')[0];
+  const list  = load('appointments', []).filter(a => a.date === today && a.status === 'accepted');
+  const body  = document.getElementById('todayBody');
+  if (!list.length) { body.innerHTML = '<tr class="empty-row"><td colspan="4">No accepted appointments today</td></tr>'; return; }
+  body.innerHTML = list.map(a => `<tr>
+    <td><strong>${a.time}</strong></td><td>${a.name}</td>
+    <td><span class="badge-status badge-accepted">${a.type}</span></td>
+    <td>${a.type==='Online' ? `<button class="btn-meet" onclick="openMeet()">🎥 Join Meet</button>` : `<button class="btn-view" onclick="viewDetail('${a.ref}')">Details</button>`}</td>
+  </tr>`).join('');
+}
+
+function renderAllApts(filter) {
+  const all  = load('appointments', []);
+  const list = filter === 'all' ? all : all.filter(a => a.status === filter);
+  const body = document.getElementById('allAptBody');
+  body.innerHTML = list.map(a => {
+    const sc = {pending:'badge-pending',accepted:'badge-accepted',completed:'badge-completed',rejected:'badge-rejected'}[a.status];
+    return `<tr>
+      <td><strong>${a.ref}</strong></td>
+      <td>${a.name}</td><td>${a.phone}</td>
+      <td>${a.date}</td><td>${a.time}</td><td>${a.type}</td>
+      <td>৳${a.fee}</td>
+      <td><span class="badge-status ${sc}">${a.status}</span></td>
+      <td>
+        ${a.status==='pending' ? `<button class="btn-accept" onclick="acceptApt('${a.ref}')">✓</button> <button class="btn-reject" onclick="rejectApt('${a.ref}')">✗</button>` : ''}
+        ${a.status==='accepted' ? `<button class="btn-meet" onclick="openMeet()">🎥</button>` : ''}
+        <button class="btn-view" onclick="viewDetail('${a.ref}')">View</button>
+      </td>
+    </tr>`;
+  }).join('') || '<tr class="empty-row"><td colspan="9">No appointments found</td></tr>';
+}
+
+/* ──────────────────────────────
+   ACCEPT / REJECT
+────────────────────────────── */
+function acceptApt(ref) {
+  const apts = load('appointments', []);
+  const apt  = apts.find(a => a.ref === ref);
+  if (!apt) return;
+  apt.status = 'accepted';
+  save('appointments', apts);
+  renderAll();
+  showToast('✅ ' + apt.name + ' accepted! Patient will be notified.', 'success');
+  closeModal();
+}
+
+function rejectApt(ref) {
+  if (!confirm('Reject this appointment?')) return;
+  const apts = load('appointments', []);
+  const apt  = apts.find(a => a.ref === ref);
+  if (!apt) return;
+  apt.status = 'rejected';
+  save('appointments', apts);
+  renderAll();
+  showToast('Appointment rejected.', 'danger');
+  closeModal();
+}
+
+function acceptFromModal() { const r = document.getElementById('detailContent').dataset.ref; if(r) acceptApt(r); }
+function rejectFromModal() { const r = document.getElementById('detailContent').dataset.ref; if(r) rejectApt(r); }
+
+/* ──────────────────────────────
+   DETAIL MODAL
+────────────────────────────── */
+function viewDetail(ref) {
+  const a = load('appointments', []).find(x => x.ref === ref);
+  if (!a) return;
+  const c = document.getElementById('detailContent');
+  c.dataset.ref = ref;
+  c.innerHTML = [
+    ['Ref No.', a.ref], ['Patient', a.name + ', ' + a.age + ' yrs'],
+    ['Phone', a.phone], ['Date & Time', a.date + ' — ' + a.time],
+    ['Type', a.type], ['Complaint', a.complaint],
+    ['Payment Method', a.payment], ['Transaction ID', a.txid],
+    ['Fee', '৳' + a.fee], ['Status', a.status.toUpperCase()]
+  ].map(([l,v]) => `<div class="detail-row"><span class="detail-label">${l}</span><span class="detail-value">${v}</span></div>`).join('');
+  document.getElementById('detailModal').classList.add('active');
+}
+
+function closeModal() { document.getElementById('detailModal').classList.remove('active'); }
+document.getElementById('detailModal').addEventListener('click', e => { if(e.target.id==='detailModal') closeModal(); });
+
+/* ──────────────────────────────
+   PATIENTS
+────────────────────────────── */
+function renderPatients(search = '') {
+  const apts = load('appointments', []);
+  const map  = {};
+  apts.forEach(a => {
+    if (!map[a.phone]) map[a.phone] = {name:a.name, age:a.age, phone:a.phone, last:a.date, visits:1, complaint:a.complaint};
+    else { map[a.phone].visits++; if(a.date > map[a.phone].last) map[a.phone].last = a.date; }
+  });
+  let list = Object.values(map);
+  if (search) list = list.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.phone.includes(search));
+  const body = document.getElementById('patientsBody');
+  body.innerHTML = list.map(p => `<tr>
+    <td><strong>${p.name}</strong></td>
+    <td>${p.age}</td><td>${p.phone}</td>
+    <td>${p.last}</td><td>${p.visits}</td>
+    <td>${p.complaint.substring(0,40)}...</td>
+  </tr>`).join('') || '<tr class="empty-row"><td colspan="6">No patients found</td></tr>';
+}
+
+/* ──────────────────────────────
+   PAYMENTS
+────────────────────────────── */
+function renderPayments() {
+  const apts = load('appointments', []);
+  document.getElementById('payBody').innerHTML = apts.map(a => {
+    const v = a.status !== 'pending';
+    return `<tr>
+      <td>${a.ref}</td><td>${a.name}</td><td>${a.payment}</td>
+      <td>৳${a.fee}</td><td>${a.txid}</td><td>${a.date}</td>
+      <td><span class="badge-status ${v?'badge-accepted':'badge-pending'}">${v?'Verified':'Pending'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ──────────────────────────────
+   ONLINE CONSULTATIONS
+────────────────────────────── */
+function renderOnline() {
+  const apts  = load('appointments', []).filter(a => a.type === 'Online' && a.status === 'accepted');
+  const sched = load('schedule', DEF_SCHEDULE);
+  const body  = document.getElementById('onlineBody');
+  if (!apts.length) { body.innerHTML = '<tr class="empty-row"><td colspan="4">No online consultations yet</td></tr>'; return; }
+  body.innerHTML = apts.map(a => `<tr>
+    <td><strong>${a.name}</strong></td>
+    <td>${a.date} — ${a.time}</td>
+    <td><a href="${sched.meetLink}" target="_blank" style="color:var(--primary-light);font-size:13px;">${sched.meetLink}</a></td>
+    <td><button class="btn-meet" onclick="openMeet()">🎥 Join</button></td>
+  </tr>`).join('');
+}
+
+function loadMeetLinkInput() {
+  const sched = load('schedule', DEF_SCHEDULE);
+  document.getElementById('meetLinkInput').value = sched.meetLink || '';
+}
+
+function saveMeetLink() {
+  const sched = load('schedule', DEF_SCHEDULE);
+  sched.meetLink = document.getElementById('meetLinkInput').value.trim();
+  save('schedule', sched);
+  renderOnline();
+  showNotice('meetNotice');
+  showToast('Meet link saved & synced!', 'success');
+}
+
+function openMeet() {
+  const sched = load('schedule', DEF_SCHEDULE);
+  window.open(sched.meetLink || 'https://meet.google.com', '_blank');
+}
+
+/* ──────────────────────────────
+   SCHEDULE
+────────────────────────────── */
+function loadScheduleForm() {
+  const s = load('schedule', DEF_SCHEDULE);
+  document.getElementById('schedStart').value = s.start || '17:00';
+  document.getElementById('schedEnd').value   = s.end   || '21:00';
+  document.getElementById('schedDays').value  = s.days  || 'Sat–Thu';
+  document.getElementById('schedMax').value   = s.max   || 12;
+}
+
+function saveSchedule() {
+  const sched = load('schedule', DEF_SCHEDULE);
+  sched.start = document.getElementById('schedStart').value;
+  sched.end   = document.getElementById('schedEnd').value;
+  sched.days  = document.getElementById('schedDays').value;
+  sched.max   = parseInt(document.getElementById('schedMax').value);
+  save('schedule', sched);
+  showNotice('schedNotice');
+  showToast('Schedule saved & synced to patient site!', 'success');
+}
+
+function renderSchedGrid() {
+  const grid = document.getElementById('schedGrid');
+  if (!grid) return;
+  const days = ['Sat','Sun','Mon','Tue','Wed','Thu','Fri'];
+  const apts = load('appointments', []);
+  const start = new Date();
+  start.setDate(start.getDate() - ((start.getDay() + 1) % 7));
+  grid.innerHTML = days.map((day, i) => {
+    const d  = new Date(start); d.setDate(start.getDate() + i);
+    const ds = d.toISOString().split('T')[0];
+    const n  = apts.filter(a => a.date === ds && a.status !== 'rejected').length;
+    const isToday = d.toDateString() === new Date().toDateString();
+    return `<div class="sched-day ${isToday?'today':''}">
+      <div class="dy-name">${day}</div>
+      <div class="dy-num">${d.getDate()}</div>
+      <div class="dy-count">${n > 0 ? n+' appts' : 'Free'}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ──────────────────────────────
+   PRESCRIPTIONS
+────────────────────────────── */
+function saveRx() {
+  const name = document.getElementById('rxName').value.trim();
+  if (!name) { showToast('Please enter patient name!', 'danger'); return; }
+  const list = load('prescriptions', []);
+  list.unshift({
+    date: new Date().toLocaleDateString('en-BD'),
+    patient: name,
+    age:    document.getElementById('rxAge').value,
+    diag:   document.getElementById('rxDiag').value,
+    meds:   document.getElementById('rxMeds').value,
+    next:   document.getElementById('rxNext').value,
+    tests:  document.getElementById('rxTests').value,
+    advice: document.getElementById('rxAdvice').value,
+  });
+  save('prescriptions', list);
+  renderRxList();
+  showToast('Prescription saved!', 'success');
+  ['rxName','rxAge','rxDiag','rxMeds','rxNext','rxTests','rxAdvice'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+}
+
+function renderRxList() {
+  const list = load('prescriptions', []);
+  const body = document.getElementById('rxListBody');
+  body.innerHTML = list.length
+    ? list.map((rx,i) => `<tr>
+        <td>${rx.date}</td><td>${rx.patient}</td><td>${rx.diag||'—'}</td>
+        <td><button class="btn-view" onclick="viewRx(${i})">View</button></td>
+      </tr>`).join('')
+    : '<tr class="empty-row"><td colspan="4">No prescriptions yet</td></tr>';
+}
+
+function viewRx(i) {
+  const rx = load('prescriptions', [])[i];
+  if (!rx) return;
+  alert(`PRESCRIPTION\n\nPatient: ${rx.patient}\nAge/Gender: ${rx.age}\nDiagnosis: ${rx.diag}\n\nMedicines:\n${rx.meds}\n\nTests: ${rx.tests}\nNext Visit: ${rx.next}\nAdvice: ${rx.advice}`);
+}
+
+/* ──────────────────────────────
+   EXPERTISE EDITOR
+────────────────────────────── */
+function renderExpertiseEditor() {
+  const list = load('expertise', DEF_EXPERTISE);
+  document.getElementById('expEditor').innerHTML = list.map((item, i) => `
+    <div class="exp-item">
+      <button class="remove-btn" onclick="removeExp(${i})">✕ Remove</button>
+      <div class="form-row">
+        <div class="form-group"><label>Icon (emoji)</label><input type="text" value="${item.icon}" id="ex-icon-${i}" maxlength="4" style="width:80px;"/></div>
+        <div class="form-group"><label>Title</label><input type="text" value="${item.title}" id="ex-title-${i}"/></div>
+      </div>
+      <div class="form-group"><label>Description</label><textarea id="ex-desc-${i}" rows="2">${item.desc}</textarea></div>
+    </div>`).join('');
+}
+
+function addExpertise() {
+  const list = load('expertise', DEF_EXPERTISE);
+  list.push({icon:'⭐', title:'New Expertise', desc:'Add description here...'});
+  save('expertise', list);
+  renderExpertiseEditor();
+}
+
+function removeExp(i) {
+  const list = load('expertise', DEF_EXPERTISE);
+  list.splice(i, 1);
+  save('expertise', list);
+  renderExpertiseEditor();
+}
+
+function saveExpertise() {
+  const list = load('expertise', DEF_EXPERTISE);
+  list.forEach((_, i) => {
+    const icon  = document.getElementById('ex-icon-'+i);
+    const title = document.getElementById('ex-title-'+i);
+    const desc  = document.getElementById('ex-desc-'+i);
+    if (icon && title && desc) list[i] = {icon:icon.value, title:title.value, desc:desc.value};
+  });
+  save('expertise', list);
+  showNotice('expNotice');
+  showToast('Expertise synced to patient website!', 'success');
+}
+
+/* ──────────────────────────────
+   PROFILE
+────────────────────────────── */
+function loadProfileForm() {
+  const p = load('profile', DEF_PROFILE);
+  document.getElementById('pfName').value       = p.name       || '';
+  document.getElementById('pfTitle').value      = p.title      || '';
+  document.getElementById('pfDegrees').value    = p.degrees    || '';
+  document.getElementById('pfSpec').value       = p.spec       || '';
+  document.getElementById('pfBmdc').value       = p.bmdc       || '';
+  document.getElementById('pfPhone').value      = p.phone      || '';
+  document.getElementById('pfAddress').value    = p.address    || '';
+  document.getElementById('pfBio').value        = p.bio        || '';
+  document.getElementById('pfExp').value        = p.experience || '';
+  document.getElementById('pfPatCount').value   = p.patients   || '';
+  document.getElementById('pfFeeOnline').value  = p.feeOnline  || 800;
+  document.getElementById('pfFeeChamber').value = p.feeChamber || 1200;
+  document.getElementById('pfFeeUrgent').value  = p.feeUrgent  || 1500;
+  // Update display
+  document.getElementById('sidebarName').textContent = p.name  || '';
+  document.getElementById('sidebarRole').textContent = p.spec  || '';
+  document.getElementById('profDispName').textContent = p.name || '';
+  document.getElementById('profDispRole').textContent = (p.title||'') + ' — ' + (p.spec||'');
+}
+
+function saveProfile() {
+  const p = {
+    name:       document.getElementById('pfName').value,
+    title:      document.getElementById('pfTitle').value,
+    degrees:    document.getElementById('pfDegrees').value,
+    spec:       document.getElementById('pfSpec').value,
+    bmdc:       document.getElementById('pfBmdc').value,
+    phone:      document.getElementById('pfPhone').value,
+    address:    document.getElementById('pfAddress').value,
+    bio:        document.getElementById('pfBio').value,
+    experience: parseInt(document.getElementById('pfExp').value) || 0,
+    patients:   document.getElementById('pfPatCount').value,
+    feeOnline:  parseInt(document.getElementById('pfFeeOnline').value)  || 800,
+    feeChamber: parseInt(document.getElementById('pfFeeChamber').value) || 1200,
+    feeUrgent:  parseInt(document.getElementById('pfFeeUrgent').value)  || 1500,
+  };
+  save('profile', p);
+  // Live update sidebar & profile header
+  document.getElementById('sidebarName').textContent = p.name;
+  document.getElementById('sidebarRole').textContent = p.spec;
+  document.getElementById('profDispName').textContent = p.name;
+  document.getElementById('profDispRole').textContent = p.title + ' — ' + p.spec;
+  showNotice('profNotice');
+  showToast('Profile saved & synced to patient website!', 'success');
+}
+
+/* ──────────────────────────────
+   CHANGE PASSWORD
+────────────────────────────── */
+function changePassword() {
+  const current  = document.getElementById('pwCurrent').value;
+  const newPass  = document.getElementById('pwNew').value;
+  const confirm  = document.getElementById('pwConfirm').value;
+  const stored   = load('password', DEFAULT_PASSWORD);
+
+  if (current !== stored) { showToast('Current password is wrong!', 'danger'); return; }
+  if (newPass.length < 6)  { showToast('New password must be at least 6 characters!', 'danger'); return; }
+  if (newPass !== confirm)  { showToast('Passwords do not match!', 'danger'); return; }
+
+  save('password', newPass);
+  document.getElementById('pwCurrent').value = '';
+  document.getElementById('pwNew').value     = '';
+  document.getElementById('pwConfirm').value = '';
+  showToast('Password updated successfully! 🔐', 'success');
+}
+
+/* ──────────────────────────────
+   HELPERS
+────────────────────────────── */
+function showNotice(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 3000);
+}
+
+function showToast(msg, type = '') {
+  const t = document.getElementById('toastEl');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.className = 'toast', 3500);
+}
+</script>
+</body>
+</html>
